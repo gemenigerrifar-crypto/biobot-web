@@ -1,99 +1,105 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioHacker Protocol</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioHacker Tracker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #1c1c1d);
+            color: var(--tg-theme-text-color, #ffffff);
             padding: 20px;
             margin: 0;
         }
         .container { display: flex; flex-direction: column; gap: 15px; }
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            padding: 15px;
-            border-radius: 12px;
-        }
-        input[type="number"] {
+        label { font-weight: bold; font-size: 14px; color: #a1a1aa; }
+        input[type="number"], input[type="range"] {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #3f3f46;
+            background: #27272a;
+            color: #fff;
+            font-size: 16px;
             box-sizing: border-box;
-            background: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #000);
+            margin-top: 5px;
         }
+        .slider-value { text-align: center; font-size: 18px; font-weight: bold; margin-top: 5px; color: #10b981; }
         button {
-            background-color: var(--tg-theme-button-color, #3390ec);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            background-color: #10b981;
+            color: #ffffff;
             border: none;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2 style="margin: 0; text-align: center;">Утренний чек-ап</h2>
+        
+        <div>
+            <label>❤️ RHR (Пульс покоя)</label>
+            <input type="number" id="rhr" inputmode="numeric" placeholder="Например: 55">
+        </div>
 
-<div class="container">
-    <h2>Утренний статус</h2>
-    
-    <div class="card">
-        <label for="rhr">❤️ RHR (Пульс покоя):</label>
-        <input type="number" id="rhr" placeholder="Например: 68">
+        <div>
+            <label>⚡️ HRV (Вариабельность)</label>
+            <input type="number" id="hrv" inputmode="numeric" placeholder="Например: 48">
+        </div>
+
+        <div>
+            <label>🧠 Самочувствие (1-10)</label>
+            <input type="range" id="wellbeing" min="1" max="10" value="8" oninput="updateVal('wb_val', this.value)">
+            <div class="slider-value" id="wb_val">8</div>
+        </div>
+
+        <div>
+            <label>💤 Качество сна (1-100)</label>
+            <input type="range" id="sleep_score" min="1" max="100" value="85" oninput="updateVal('slp_val', this.value)">
+            <div class="slider-value" id="slp_val">85</div>
+        </div>
+
+        <div>
+            <label>👅 Налет на языке (Ама)</label>
+            <p style="font-size: 12px; margin: 5px 0; color: #a1a1aa;">1 - чистый, 3 - белый, 5 - плотный белый/желтый</p>
+            <input type="range" id="tongue" min="1" max="5" value="1" oninput="updateVal('tng_val', this.value)">
+            <div class="slider-value" id="tng_val">1</div>
+        </div>
+
+        <button onclick="sendData()">Отправить метрики</button>
     </div>
 
-    <div class="card">
-        <label for="hrv">⚡️ HRV (Вариабельность):</label>
-        <input type="number" id="hrv" placeholder="Например: 44">
-    </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    <div class="card">
-        <label>
-            <input type="checkbox" id="ashwagandha"> Ашвагандха (2 капсулы) выпита
-        </label>
-    </div>
-
-    <button onclick="sendDataToBot()">Сохранить метрики</button>
-</div>
-
-<script>
-    // Инициализация приложения Telegram
-    let tg = window.Telegram.WebApp;
-    tg.expand(); // Разворачиваем на весь экран
-
-    function sendDataToBot() {
-        const rhr = document.getElementById('rhr').value;
-        const hrv = document.getElementById('hrv').value;
-        const ashwa = document.getElementById('ashwagandha').checked;
-
-        if (!rhr || !hrv) {
-            tg.showAlert("Введи значения RHR и HRV!");
-            return;
+        function updateVal(id, val) {
+            document.getElementById(id).innerText = val;
         }
 
-        // Собираем данные в JSON
-        const data = {
-            action: "morning_update",
-            rhr: rhr,
-            hrv: hrv,
-            ashwa_taken: ashwa
-        };
+        function sendData() {
+            const data = {
+                rhr: document.getElementById('rhr').value,
+                hrv: document.getElementById('hrv').value,
+                wellbeing: document.getElementById('wellbeing').value,
+                sleep_score: document.getElementById('sleep_score').value,
+                tongue: document.getElementById('tongue').value
+            };
 
-        // Отправляем данные обратно в бота и закрываем окно
-        tg.sendData(JSON.stringify(data));
-        tg.close();
-    }
-</script>
+            if(!data.rhr || !data.hrv) {
+                tg.showAlert("Введите RHR и HRV!");
+                return;
+            }
 
+            tg.sendData(JSON.stringify(data));
+        }
+    </script>
 </body>
 </html>

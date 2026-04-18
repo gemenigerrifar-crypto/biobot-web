@@ -3,101 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BioHacker Tracker</title>
+    <title>BioBot Control Panel</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #1c1c1d);
-            color: var(--tg-theme-text-color, #ffffff);
-            padding: 20px;
-            margin: 0;
-        }
-        .container { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; font-size: 14px; color: #a1a1aa; }
-        input[type="number"], input[type="range"] {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #3f3f46;
-            background: #27272a;
-            color: #fff;
-            font-size: 16px;
-            box-sizing: border-box;
-            margin-top: 5px;
-        }
-        .slider-value { text-align: center; font-size: 18px; font-weight: bold; margin-top: 5px; color: #10b981; }
-        button {
-            background-color: #10b981;
-            color: #ffffff;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        :root { --bg: #1c1c1d; --card: #2c2c2e; --text: #ffffff; --green: #30d158; --accent: #0a84ff; }
+        body { font-family: -apple-system, system-ui; background: var(--bg); color: var(--text); padding: 15px; margin: 0; }
+        .section { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #3a3a3c; }
+        h3 { margin: 0 0 10px 0; font-size: 16px; color: #a1a1aa; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        input[type="number"] { width: 100%; padding: 10px; background: #3a3a3c; border: none; border-radius: 8px; color: white; box-sizing: border-box; }
+        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #3a3a3c; }
+        .check-item:last-child { border: none; }
+        input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--green); }
+        button { width: 100%; padding: 15px; border-radius: 12px; border: none; background: var(--green); color: white; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .slider-val { font-weight: bold; color: var(--green); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 style="margin: 0; text-align: center;">Утренний чек-ап</h2>
-        
-        <div>
-            <label>❤️ RHR (Пульс покоя)</label>
-            <input type="number" id="rhr" inputmode="numeric" placeholder="Например: 55">
+    <div class="section">
+        <h3>📊 Утренние Метрики</h3>
+        <div class="grid">
+            <div><label>RHR</label><input type="number" id="rhr" placeholder="Пульс"></div>
+            <div><label>HRV</label><input type="number" id="hrv" placeholder="Вариаб."></div>
         </div>
-
-        <div>
-            <label>⚡️ HRV (Вариабельность)</label>
-            <input type="number" id="hrv" inputmode="numeric" placeholder="Например: 48">
+        <div style="margin-top:10px">
+            <label>Налет (1-5): <span id="t_v" class="slider-val">1</span></label>
+            <input type="range" id="tongue" min="1" max="5" value="1" style="width:100%" oninput="document.getElementById('t_v').innerText=this.value">
         </div>
-
-        <div>
-            <label>🧠 Самочувствие (1-10)</label>
-            <input type="range" id="wellbeing" min="1" max="10" value="8" oninput="updateVal('wb_val', this.value)">
-            <div class="slider-value" id="wb_val">8</div>
-        </div>
-
-        <div>
-            <label>💤 Качество сна (1-100)</label>
-            <input type="range" id="sleep_score" min="1" max="100" value="85" oninput="updateVal('slp_val', this.value)">
-            <div class="slider-value" id="slp_val">85</div>
-        </div>
-
-        <div>
-            <label>👅 Налет на языке (Ама)</label>
-            <p style="font-size: 12px; margin: 5px 0; color: #a1a1aa;">1 - чистый, 3 - белый, 5 - плотный белый/желтый</p>
-            <input type="range" id="tongue" min="1" max="5" value="1" oninput="updateVal('tng_val', this.value)">
-            <div class="slider-value" id="tng_val">1</div>
-        </div>
-
-        <button onclick="sendData()">Отправить метрики</button>
     </div>
+
+    <div class="section">
+        <h3>💊 Чек-лист приема</h3>
+        <div id="check-list">
+            <div class="check-item"><span>Ашвагандха + MCT</span><input type="checkbox" class="supp" value="ashwa_mct"></div>
+            <div class="check-item"><span>Спирулина</span><input type="checkbox" class="supp" value="spirulina"></div>
+            <div class="check-item"><span>Чай Tulsi/Ginger (Днем)</span><input type="checkbox" class="supp" value="tulsi_day"></div>
+            <div class="check-item"><span>Энтеросгель</span><input type="checkbox" class="supp" value="gel"></div>
+            <div class="check-item"><span>Орехи (Пекан/Бразильский)</span><input type="checkbox" class="supp" value="nuts"></div>
+            <div class="check-item"><span>Магний + Трифала (Вечер)</span><input type="checkbox" class="supp" value="evening_stack"></div>
+        </div>
+    </div>
+
+    <button onclick="sendData()">ОТПРАВИТЬ ОТЧЕТ</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
-        function updateVal(id, val) {
-            document.getElementById(id).innerText = val;
-        }
-
         function sendData() {
+            const checks = Array.from(document.querySelectorAll('.supp:checked')).map(el => el.value);
             const data = {
-                rhr: document.getElementById('rhr').value,
-                hrv: document.getElementById('hrv').value,
-                wellbeing: document.getElementById('wellbeing').value,
-                sleep_score: document.getElementById('sleep_score').value,
-                tongue: document.getElementById('tongue').value
+                rhr: document.getElementById('rhr').value || 0,
+                hrv: document.getElementById('hrv').value || 0,
+                tongue: document.getElementById('tongue').value,
+                wellbeing: 8, // Дефолт, если не трогали ползунок
+                sleep_score: 85,
+                taken: checks
             };
-
-            if(!data.rhr || !data.hrv) {
-                tg.showAlert("Введите RHR и HRV!");
-                return;
-            }
-
             tg.sendData(JSON.stringify(data));
         }
     </script>

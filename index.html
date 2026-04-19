@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BioBot v8.0</title>
+    <title>BioBot v8.1</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #1c1c1e; --card: #2c2c2e; --green: #30d158; --text: #ffffff; }
@@ -13,6 +13,7 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         input[type="number"] { width: 100%; padding: 12px; background: #1c1c1e; border: none; border-radius: 8px; color: white; box-sizing: border-box; }
         button { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--green); color: white; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .report-btn { background: #007AFF; }
     </style>
 </head>
 <body>
@@ -33,9 +34,11 @@
     </div>
 
     <button onclick="sendToBot()">ОТПРАВИТЬ ОТЧЁТ</button>
+    <button onclick="requestReport()" class="report-btn">📊 ОТЧЁТ ЗА СЕГОДНЯ</button>
 
     <script>
         const tg = window.Telegram.WebApp;
+        
         function sendToBot() {
             const rhr = document.getElementById('rhr').value;
             const hrv = document.getElementById('hrv').value;
@@ -55,6 +58,11 @@
             };
 
             tg.sendData(JSON.stringify(data));
+            tg.close();
+        }
+
+        function requestReport() {
+            tg.sendData(JSON.stringify({action: "report"}));
             tg.close();
         }
     </script>

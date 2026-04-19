@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BioBot v7.0</title>
+    <title>BioBot v8.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #1c1c1e; --card: #2c2c2e; --green: #30d158; --text: #ffffff; }
@@ -12,8 +12,6 @@
         h3 { margin: 0 0 10px 0; font-size: 14px; color: #8e8e93; text-transform: uppercase; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         input[type="number"] { width: 100%; padding: 12px; background: #1c1c1e; border: none; border-radius: 8px; color: white; box-sizing: border-box; }
-        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #38383a; }
-        input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--green); }
         button { width: 100%; padding: 16px; border-radius: 14px; border: none; background: var(--green); color: white; font-weight: bold; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
@@ -21,47 +19,43 @@
     <div class="section">
         <h3>Метрики с часов</h3>
         <div class="grid">
-            <div><label style="font-size:12px">RHR (Пульс)</label><input type="number" id="rhr"></div>
-            <div><label style="font-size:12px">HRV (Вариаб.)</label><input type="number" id="hrv"></div>
+            <div><label style="font-size:12px">RHR (Пульс)</label><input type="number" id="rhr" placeholder="52"></div>
+            <div><label style="font-size:12px">HRV (Вариаб.)</label><input type="number" id="hrv" placeholder="48"></div>
         </div>
         <div style="margin-top:10px">
-            <label style="font-size:12px">Sleep Score (Сон)</label>
-            <input type="number" id="sleep_score" placeholder="0-100">
+            <label style="font-size:12px">Sleep Score (Сон 0-100)</label>
+            <input type="number" id="sleep_score" placeholder="85">
+        </div>
+        <div style="margin-top:10px">
+            <label style="font-size:12px">Самочувствие (1-10)</label>
+            <input type="number" id="wellbeing" placeholder="8">
         </div>
     </div>
 
-    <div class="section">
-        <h3>Прием препаратов и еды</h3>
-        <div id="check-list">
-            <div class="check-item"><span>Стек (Мумие/Ашва/Спир)</span><input type="checkbox" class="log" value="meds_morning"></div>
-            <div class="check-item"><span>Завтрак + MCT</span><input type="checkbox" class="log" value="breakfast"></div>
-            <div class="check-item"><span>Энтеросгель (Детокс)</span><input type="checkbox" class="log" value="gel"></div>
-            <div class="check-item"><span>Обед + Орехи</span><input type="checkbox" class="log" value="lunch"></div>
-            <div class="check-item"><span>Ужин + Макадамия</span><input type="checkbox" class="log" value="dinner"></div>
-            <div class="check-item"><span>Вечерний стек (Магний/Трифала)</span><input type="checkbox" class="log" value="meds_evening"></div>
-        </div>
-    </div>
-
-    <div class="section">
-        <h3>Самочувствие</h3>
-        <label>Налет (1-5): <span id="t_v">1</span></label>
-        <input type="range" id="tongue" min="1" max="5" value="1" style="width:100%" oninput="document.getElementById('t_v').innerText=this.value">
-    </div>
-
-    <button onclick="sendToBot()">ОТПРАВИТЬ ОТЧЕТ</button>
+    <button onclick="sendToBot()">ОТПРАВИТЬ ОТЧЁТ</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         function sendToBot() {
-            const checks = Array.from(document.querySelectorAll('.log:checked')).map(el => el.value);
+            const rhr = document.getElementById('rhr').value;
+            const hrv = document.getElementById('hrv').value;
+            const sleep = document.getElementById('sleep_score').value;
+            const wellbeing = document.getElementById('wellbeing').value;
+
+            if (!rhr || !hrv || !sleep || !wellbeing) {
+                tg.showAlert("⚠️ Заполни все поля!");
+                return;
+            }
+
             const data = {
-                rhr: document.getElementById('rhr').value || null,
-                hrv: document.getElementById('hrv').value || null,
-                sleep_score: document.getElementById('sleep_score').value || null,
-                tongue: document.getElementById('tongue').value,
-                taken: checks
+                rhr: parseInt(rhr),
+                hrv: parseInt(hrv),
+                sleep_score: parseInt(sleep),
+                wellbeing: parseInt(wellbeing)
             };
+
             tg.sendData(JSON.stringify(data));
+            tg.close();
         }
     </script>
 </body>

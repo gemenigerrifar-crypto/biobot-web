@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BioBot v6.0</title>
+    <title>BioBot v7.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #1c1c1e; --card: #2c2c2e; --green: #30d158; --text: #ffffff; }
@@ -19,36 +19,36 @@
 </head>
 <body>
     <div class="section">
-        <h3>📊 Метрики (Утро/Вечер)</h3>
+        <h3>Метрики с часов</h3>
         <div class="grid">
-            <div><label style="font-size:12px">RHR (Пульс)</label><input type="number" id="rhr" placeholder="--"></div>
-            <div><label style="font-size:12px">HRV (Вариаб.)</label><input type="number" id="hrv" placeholder="--"></div>
+            <div><label style="font-size:12px">RHR (Пульс)</label><input type="number" id="rhr"></div>
+            <div><label style="font-size:12px">HRV (Вариаб.)</label><input type="number" id="hrv"></div>
         </div>
         <div style="margin-top:10px">
             <label style="font-size:12px">Sleep Score (Сон)</label>
-            <input type="number" id="sleep_score" placeholder="0-100" style="margin-top:5px">
+            <input type="number" id="sleep_score" placeholder="0-100">
         </div>
     </div>
 
     <div class="section">
-        <h3>💊 Чек-лист протокола</h3>
+        <h3>Прием препаратов и еды</h3>
         <div id="check-list">
             <div class="check-item"><span>Стек (Мумие/Ашва/Спир)</span><input type="checkbox" class="log" value="meds_morning"></div>
-            <div class="check-item"><span>Льняная/Конопляная каша + MCT</span><input type="checkbox" class="log" value="breakfast"></div>
+            <div class="check-item"><span>Завтрак + MCT</span><input type="checkbox" class="log" value="breakfast"></div>
             <div class="check-item"><span>Энтеросгель (Детокс)</span><input type="checkbox" class="log" value="gel"></div>
-            <div class="check-item"><span>Орехи (Пекан/Бразильский)</span><input type="checkbox" class="log" value="lunch"></div>
-            <div class="check-item"><span>Макадамия (Ужин)</span><input type="checkbox" class="log" value="dinner"></div>
+            <div class="check-item"><span>Обед + Орехи</span><input type="checkbox" class="log" value="lunch"></div>
+            <div class="check-item"><span>Ужин + Макадамия</span><input type="checkbox" class="log" value="dinner"></div>
             <div class="check-item"><span>Вечерний стек (Магний/Трифала)</span><input type="checkbox" class="log" value="meds_evening"></div>
         </div>
     </div>
 
     <div class="section">
-        <h3>👅 Состояние</h3>
-        <label>Налет (1-5): <span id="t_v" style="color:var(--green)">1</span></label>
+        <h3>Самочувствие</h3>
+        <label>Налет (1-5): <span id="t_v">1</span></label>
         <input type="range" id="tongue" min="1" max="5" value="1" style="width:100%" oninput="document.getElementById('t_v').innerText=this.value">
     </div>
 
-    <button onclick="sendToBot()">СОХРАНИТЬ ДАННЫЕ</button>
+    <button onclick="sendToBot()">ОТПРАВИТЬ ОТЧЕТ</button>
 
     <script>
         const tg = window.Telegram.WebApp;
